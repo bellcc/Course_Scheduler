@@ -6,11 +6,8 @@ public class Course {
 	String hours;
 	String enrollment;
 	String max_enrollment;
-	String start_time;
-	String end_time;
 	String room;
 	String meeting_category;
-
 	String subject;
 	String section;
 	String title;
@@ -19,6 +16,9 @@ public class Course {
 	String instructor;
 	String meeting_type;
 
+	int start_time;
+	int end_time;
+
 	public Course() {
 
 		course_num = "";
@@ -26,11 +26,8 @@ public class Course {
 		hours = "";
 		enrollment = "";
 		max_enrollment = "";
-		start_time = "";
-		end_time = "";
 		room = "";
 		meeting_category = "";
-
 		subject = "";
 		section = "";
 		title = "";
@@ -39,20 +36,20 @@ public class Course {
 		instructor = "";
 		meeting_type = "";
 
+		start_time = 0;
+		end_time = 0;
+
 	}
 
-	public Course(String crn, String co, String hr, String en, String me, String st, String et, String rm, String mc, String sb, String se, String ti, String ds, String bu, String in, String mt) {
+	public Course(String crn, String co, String hr, String en, String me, String rm, String mc, String sb, String se, String ti, String ds, String bu, String in, String mt, int st, int et) {
 
 		course_num = crn;
 		course = co;
 		hours = hr;
 		enrollment = en;
 		max_enrollment = me;
-		start_time = st;
-		end_time = et;
 		room = rm;
 		meeting_category = mc;
-
 		subject = sb;
 		section = se;
 		title = ti;
@@ -60,6 +57,9 @@ public class Course {
 		building = bu;
 		instructor = in;
 		meeting_type = mt;
+
+		start_time = st;
+		end_time = et;
 
 	}
 
@@ -93,13 +93,13 @@ public class Course {
 
 	}
 
-	public void setStartTime(String st) {
+	public void setStartTime(int st) {
 
 		start_time = st;
 
 	}
 
-	public void setEndTime(String et) {
+	public void setEndTime(int et) {
 
 		end_time = et;
 
@@ -189,13 +189,13 @@ public class Course {
 
 	}
 
-	public String getStartTime() {
+	public int getStartTime() {
 
 		return start_time;
 
 	}
 
-	public String getEndTime() {
+	public int getEndTime() {
 
 		return end_time;
 

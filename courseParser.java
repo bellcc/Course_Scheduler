@@ -76,7 +76,26 @@ public final class courseParser {
 
 				}
 
-				Course aCourse = new Course(parts_tmp[0], parts_tmp[2], parts_tmp[5], parts_tmp[6], parts_tmp[7], parts_tmp[8], parts_tmp[9], parts_tmp[12], parts_tmp[15], parts_tmp[1], parts_tmp[3], parts_tmp[4], parts_tmp[10], parts_tmp[11], parts_tmp[13], parts_tmp[14]);
+				int st = 0;
+				int et = 0;
+
+				try {
+
+					st = Integer.parseInt(parts_tmp[8]);
+					et = Integer.parseInt(parts_tmp[9]);
+				
+				}
+				catch (NumberFormatException e) {
+
+					st = -1;
+					et = -1;
+
+				}
+
+				System.out.println(st);
+				System.out.println(et);
+
+				Course aCourse = new Course(parts_tmp[0], parts_tmp[2], parts_tmp[5], parts_tmp[6], parts_tmp[7], parts_tmp[12], parts_tmp[15], parts_tmp[1], parts_tmp[3], parts_tmp[4], parts_tmp[10], parts_tmp[11], parts_tmp[13], parts_tmp[14], st, et);
 
 				schedule.add(aCourse);
 
@@ -91,7 +110,23 @@ public final class courseParser {
 
 		}
 
+		printSchedule(schedule);
+
 		return schedule;
+
+	}
+
+	private static void printSchedule(ArrayList<Course> schedule) {
+
+		for(int i=0;i<schedule.size();i++) {
+
+			Course tmp = schedule.get(i);
+
+			System.out.println(tmp.toString());
+
+			System.out.println("- - - - - - - - - - - - - - - - - - - -");
+
+		}
 
 	}
 
