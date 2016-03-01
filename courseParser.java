@@ -92,9 +92,6 @@ public final class courseParser {
 
 				}
 
-				System.out.println(st);
-				System.out.println(et);
-
 				Course aCourse = new Course(parts_tmp[0], parts_tmp[2], parts_tmp[5], parts_tmp[6], parts_tmp[7], parts_tmp[12], parts_tmp[15], parts_tmp[1], parts_tmp[3], parts_tmp[4], parts_tmp[10], parts_tmp[11], parts_tmp[13], parts_tmp[14], st, et);
 
 				schedule.add(aCourse);
@@ -109,8 +106,6 @@ public final class courseParser {
 			System.out.println("The course schedule file is missing.");
 
 		}
-
-		printSchedule(schedule);
 
 		return schedule;
 
