@@ -262,5 +262,22 @@ public class Course {
 		return str;
 
 	}
+	
+	 public String getCourseSubNum() {
+	 	
+ 		return subject + course;
+ 		
+ 	}
+ 	
+ 	public String toDisplay() {
+ 		
+ 		String str = "";
+ 		if(getDays().equals(""))
+ 			str = subject + course + " (" + getSection().trim() + ") - " + title + " (" + hours + ")"  +  " (" + instructor + ")";
+ 		else
+ 			str = subject + course + " (" + getSection().trim() + ") - " + title + " (" + hours + ") - " + days + ": " + start_time + "-" + end_time + " (" + instructor + ")";
+ 		return str;
+ 		
+ 	}
 
 }
