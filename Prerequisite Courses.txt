@@ -1,0 +1,24 @@
+BOT116 - Biological Concepts: Structure, Function, Cellular and Molecular Biology
+BOT342 - Genetics
+CSE102 - Introduction to Computing and Engineering
+CSE153 - Introduction to C/C++ Programming
+CSE163 - Introduction to Computer Concepts and Programming
+CSE174 - Fundamentals of Programming and Problem Solving
+CSE201 - Introduction to Software Engineering
+CSE271 - Object-Oriented Programming
+CSE274 - Data Abstraction and Data Structures
+CSE278 - Computer Architecture
+CSE283 - Data Communications and Networks
+CSE383 - Client Server Systems
+CSE385 - Database Systems
+CSE386 - Introduction to Computer Graphics
+CSE448 - Senior Design Project I
+ENG111 - Composition and Rhetoric 
+MTH151 - Calculus I
+MTH231 - Elements of Discrete Mathematics
+MTH245 - Differential Equations for Engineers
+MTH251 - Calculus II
+MTH347 - Differential Equations
+STA368 - Introduction to Statistics
+STA401 - Probability
+STA462 - Inferential Statistics
