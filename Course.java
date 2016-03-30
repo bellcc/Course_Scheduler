@@ -15,9 +15,11 @@ public class Course {
 	String building;
 	String instructor;
 	String meeting_type;
+	char exam_day;
 
 	int start_time;
 	int end_time;
+	int exam_time;
 
 	public Course() {
 
@@ -35,9 +37,11 @@ public class Course {
 		building = "";
 		instructor = "";
 		meeting_type = "";
+		exam_day = ' ';
 
 		start_time = 0;
 		end_time = 0;
+		exam_time = 0;
 
 	}
 
@@ -60,6 +64,8 @@ public class Course {
 
 		start_time = st;
 		end_time = et;
+		
+		setExam();
 
 	}
 
@@ -254,6 +260,18 @@ public class Course {
 		return meeting_type;
 
 	}
+	
+	public char getExamDay() {
+		
+		return exam_day;
+		
+	}
+	
+	public int getExamTime() {
+		
+		return exam_time;
+		
+	}
 
 	public String toString() {
 
@@ -279,5 +297,132 @@ public class Course {
  		return str;
  		
  	}
+ 	
+ 	// Set exam day and startTime for class
+	public void setExam() {
+			
+		if (start_time < 1000) {
+			between8And10();
+		} else if ((start_time < 1130) && (start_time >= 1000)) {
+			between10And1130();
+		} else if ((start_time < 1300) && (start_time >= 1130)) {
+			between1130And1();
+		} else if ((start_time < 1430) && (start_time >= 1300)) {
+			between1And230();
+		} else if ((start_time < 1600) && (start_time >= 1430)) {
+			between230And4();
+		} else if ((start_time < 1730) && (start_time >= 1600)) {
+			between4And530();
+		} else if ((start_time >= 1730)) {
+			past530();
+		} else {
+			exam_day = ' ';
+			exam_time = 0;
+		}
+	}
+		
+	// For classes between 8 and 10
+	public void between8And10() {
+			
+		if(days.contains("M") || days.contains("W") || days.contains("F")) {
+			exam_day = 'W';
+			exam_time = 800;
+		} else {
+			exam_day = 'T';
+			exam_time = 800;
+		}
+	}
+		
+	// For classes between 10 and 11:30
+	public void between10And1130() {
+			
+		if(days.contains("M") || days.contains("W") || days.contains("F")) {
+			exam_day = 'F';
+			exam_time = 1015;
+		} else {
+			exam_day = 'R';
+			exam_time = 800;
+		}
+	}
+		
+	// For classes between 11:30 and 1
+	public void between1130And1() {
+			
+		if(days.contains("M") || days.contains("W") || days.contains("F")) {
+			exam_day = 'W';
+			exam_time = 1015;
+		} else {
+			exam_day = 'T';
+			exam_time = 1245;
+		}
+	}
+		
+	// For classes between 1 and 2:30
+	public void between1And230() {
+			
+		if(days.contains("M") || days.contains("W") || days.contains("F")) {
+			exam_day = 'M';
+			exam_time = 1245;
+		} else {
+			exam_day = 'R';
+			exam_time = 1245;
+		}
+	}
+		
+	// For classes between 2:30 and 4
+	public void between230And4() {
+			
+		if(days.contains("M") || days.contains("W") || days.contains("F")) {
+			exam_day = 'W';
+			exam_time = 1500;
+		} else {
+			exam_day = 'T';
+			exam_time = 1500;
+		}
+	}
+		
+	// For classes between 4 and 5:30
+	public void between4And530() {
+			
+		if(days.contains("M") || days.contains("W") || days.contains("F")) {
+			exam_day = 'M';
+			exam_time = 1500;
+		} else {
+			exam_day = 'R';
+			exam_time = 1500;
+		}
+	}
+		
+	// For classes at or after 5:30pm
+	public void past530() {
+			
+		switch(days) {
+			case "M": 
+				exam_day = 'M';
+				exam_time = 1945;
+				break;
+			case "T":
+				exam_day = 'T';
+				exam_time = 1945;
+				break;
+			case "W":
+				exam_day = 'W';
+				exam_time = 1945;
+				break;
+			case "R":
+				exam_day = 'R';
+				exam_time = 1945;
+				break;
+			case "MW":
+				exam_day = 'W';
+				exam_time = 1730;
+				break;
+			case "TR":
+				exam_day = 'T';
+				exam_time = 1730;
+				break;
+				
+		}
+	}
 
 }
