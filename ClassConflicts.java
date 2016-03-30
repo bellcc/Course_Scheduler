@@ -2,7 +2,7 @@
 public class ClassConflicts {
 
 	//return true if classes overlap at any time
-	public static boolean isConflict(CourseInfo class1, CourseInfo class2) {
+	public static boolean hasConflict(CourseInfo class1, CourseInfo class2) {
 		
 		//check if times overlap
 		if((class1.getStartTime() <= class2.getEndTime()) && 
@@ -21,5 +21,17 @@ public class ClassConflicts {
 		
 		return false;
 	
+	}
+	
+	// Return true if two courses have conflicting exam times
+	public static boolean hasExamConflict(CourseInfo first, CourseInfo second) {
+		
+		if((first.getExamDay() == second.getExamDay()) &&
+				(first.getExamTime() == second.getExamTime()) &&
+				(first.getExamTime() != 0)) {
+			return true;
+		}
+		
+		return false;
 	}
 }
