@@ -21,58 +21,111 @@ import javax.swing.SwingConstants;
 public class MainWindow extends JFrame {
 
 	private static String[] prereqCourses;
+	private static String[] cseCoreRequirements;
+	private static String[] cseElectives;
+	private static String[] seCoreRequirements;
+	private static String[] seElectives;
 	private ArrayList<Course> arrayListCourses;
 	private static ArrayList<Course> proposedSchedule = new ArrayList<Course>();
 
 	private String[] shortPrereqsPassed;
-	private String[] longPrereqsPassed;
-	private String[] longPrereqCoursesRemaining;
-	private String[] longProposedSchedule;
-	private String[] longCSECoursesRemaining;
+	private String[] prereqsPassed;
+	private String[] prereqCoursesRemaining;
+	private String[] stringProposedSchedule;
+	private String[] coreRequirementCourses;
+	private String[] electiveCourses;
+	private String[] otherCourses;
+	private String[] coreRequirementCoursesRemaining;
+	private String[] electiveCoursesRemaining;
+	private String[] otherCoursesRemaining;
 	private int totalCreditsEarned;
 	private boolean prerequisitesFinalized = false;
 	private boolean addCoursesFinalized = false;
+	private boolean interfacePageOne;
 	private boolean freshman;
 	private boolean sophomore;
 	private boolean junior;
 	private boolean senior;
+	private boolean isCSEMajor;
+	private boolean isSEMajor;
 
 	private JLabel prereqsListLabel;
 	private JLabel passedCoursesLabel;
-	private JLabel courseListLabel;
-	private JLabel coursesToAddLabel;
+	private JLabel coreRequirementsLabel;
+	private JLabel electivesLabel;
+	private JLabel otherCoursesLabel;
+	private JLabel proposedScheduleLabel;
 	private JLabel creditsEarnedLabel;
 	private JButton processButton;
 	private JButton addCoursesButton;
-	private JList leftSideList;
+	private JList prereqsList;
 	private JList rightSideList;
-	private SortedListModel sortedLeftSideList;
+	private JList coreRequirementsList;
+	private JList electivesList;
+	private JList otherCoursesList;
+	private SortedListModel sortedPrereqsList;
 	private SortedListModel sortedRightSideList;
-	private JScrollPane scrollSortedLeftSideList;
+	private SortedListModel sortedCoreRequirementsList;
+	private SortedListModel sortedElectivesList;
+	private SortedListModel sortedOtherCoursesList;
+	private JScrollPane scrollSortedPrereqsList;
 	private JScrollPane scrollSortedRightSideList;
+	private JScrollPane scrollSortedCoreRequirementsList;
+	private JScrollPane scrollSortedElectivesList;
+	private JScrollPane scrollSortedOtherCoursesList;
+	private JCheckBox cseMajorBox;
+	private JCheckBox seMajorBox;
 	private JCheckBox freshmanBox;
 	private JCheckBox sophomoreBox;
 	private JCheckBox juniorBox;
 	private JCheckBox seniorBox;
 	private JTextField creditsEarned;
 	private ButtonGroup collegeYear;
+	private ButtonGroup major;
 
 	public MainWindow() throws FileNotFoundException {
 		getPrereqCourses();
 		getCourses();
+		getCourseTypes();
 		setUpMainWindow();
 	}
 
+	/**
+	 * Gets the prerequisites for CSE and SE courses in a course 
+	 * subject + course number format
+	 * @throws FileNotFoundException
+	 */
 	private void getPrereqCourses() throws FileNotFoundException {
 		File file = new File("Prerequisite Courses.txt");
-		prereqCourses = PrerequisiteCoursesParser.parsePrereqCoursesFile(file);
+		prereqCourses = PrereqsCourseTypeParser.parseCourses(file);
 
 	}
 
+	/**
+	 * Gets the courses from the .csv file and returns the course
+	 * objects in an ArrayList
+	 * @throws FileNotFoundException
+	 */
 	private void getCourses() throws FileNotFoundException {
 		File file = new File("CSECourses.csv");
 		arrayListCourses = CourseParser.parseFile(file);
 	}
+	
+	/**
+	 * Gets a list of courses that are either core requirements or
+	 * electives for CSE and SE majors.
+	 * @throws FileNotFoundException
+	 */
+	private void getCourseTypes() throws FileNotFoundException {
+		File cseCore = new File("cseCoreRequirements.txt");
+		File cseE = new File("cseElectives.txt");
+		File seCore = new File("seCoreRequirements.txt");
+		File seE = new File("seElectives.txt");
+		cseCoreRequirements = PrereqsCourseTypeParser.parseCourses(cseCore);
+		cseElectives = PrereqsCourseTypeParser.parseCourses(cseE);
+		seCoreRequirements = PrereqsCourseTypeParser.parseCourses(seCore);
+		seElectives = PrereqsCourseTypeParser.parseCourses(seE);
+		}
 
 	private void setUpMainWindow() { // ============================================================== HOMEPAGE FUNCTIONALITY
 
@@ -89,11 +142,13 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				addCourseWindow();
 				if (prerequisitesFinalized()) { // If prerequisites have been set before, reopen window showing those prerequisites
-					clearLeftListModel();
-					clearRightListModel();
-					addLeftList(getLongPrereqsRemaining());
-					addRightList(getLongPrereqsPassed());
+					clearPrereqsList();
+					clearRightSideList();
+					addPrereqsList(getPrereqsRemaining());
+					addRightList(getPrereqsPassed());
 					// Sets the state of the check boxes that were set in the previous set prerequisites window
+					cseMajorBox.setSelected(isCSEMajor);
+					seMajorBox.setSelected(isSEMajor);
 					freshmanBox.setSelected(freshman);
 					sophomoreBox.setSelected(sophomore);
 					juniorBox.setSelected(junior);
@@ -103,11 +158,10 @@ public class MainWindow extends JFrame {
 				}
 				// If it's the first time setting prerequisites, open a fresh window with CSE course prerequisite classes in the left list
 				else {
-					addLeftList(prereqCourses);
+					addPrereqsList(prereqCourses);
 				}
 			}
 		});
-
 		mainWindow.add(setUpPreReqButton);
 
 		mainWindow.setVisible(true);
@@ -115,80 +169,218 @@ public class MainWindow extends JFrame {
 
 	@SuppressWarnings("unchecked")
 	public void addCourseWindow() { // ============================================================== ADD COURSE FUNCTIONALITY
-
+		
+		interfacePageOne = true;
+		
 		JFrame addCourseWindow = new JFrame("Add Course Window");
-		addCourseWindow.setSize(1228, 490);
+		addCourseWindow.setSize(1228, 535);
 		addCourseWindow.setResizable(false);
 		addCourseWindow.setLayout(null);
+		
+		cseMajorBox = new JCheckBox("Computer Science Major");
+		cseMajorBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		cseMajorBox.setHorizontalTextPosition(SwingConstants.LEFT);
+		cseMajorBox.setBounds(423, 12, 170, 22);
+		cseMajorBox.setFont(new Font("Tahoma", Font.BOLD, 11));
+		addCourseWindow.getContentPane().add(cseMajorBox);
+		
+		seMajorBox = new JCheckBox("Software Engineering Major");
+		seMajorBox.setBounds(705, 12, 185, 22);
+		seMajorBox.setFont(new Font("Tahoma", Font.BOLD, 11));
+		addCourseWindow.getContentPane().add(seMajorBox);
+		
+		major = new ButtonGroup();
+		major.add(cseMajorBox);
+		major.add(seMajorBox);
 
 		prereqsListLabel = new JLabel("Prerequisites List");
 		prereqsListLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-		prereqsListLabel.setBounds(93, 10, 100, 14);
+		prereqsListLabel.setBounds(93, 48, 100, 14);
 		addCourseWindow.add(prereqsListLabel);
 		prereqsListLabel.setVisible(true);
 
 		passedCoursesLabel = new JLabel("Prerequisites Passed");
 		passedCoursesLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-		passedCoursesLabel.setBounds(705, 10, 120, 14);
+		passedCoursesLabel.setBounds(705, 48, 120, 14);
 		addCourseWindow.add(passedCoursesLabel);
 		passedCoursesLabel.setVisible(true);
+		
+		coreRequirementsLabel = new JLabel("Core Requirements");
+		coreRequirementsLabel.setBounds(478, 48, 115, 14);
+		coreRequirementsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		coreRequirementsLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		addCourseWindow.getContentPane().add(coreRequirementsLabel);
+		coreRequirementsLabel.setVisible(false);
+		
+		sortedCoreRequirementsList = new SortedListModel();
+		coreRequirementsList = new JList(sortedCoreRequirementsList);
+		coreRequirementsList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedCoreRequirementsList = new JScrollPane(coreRequirementsList);
+		scrollSortedCoreRequirementsList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedCoreRequirementsList.setBounds(93, 68, 500, 110);
+		addCourseWindow.getContentPane().add(scrollSortedCoreRequirementsList);
+		coreRequirementsList.setVisible(false);
+		scrollSortedCoreRequirementsList.setVisible(false);
+		
+		electivesLabel = new JLabel("Electives");
+		electivesLabel.setBounds(478, 182, 115, 20);
+		electivesLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		electivesLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		addCourseWindow.getContentPane().add(electivesLabel);
+		electivesLabel.setVisible(false);
+		
+		sortedElectivesList = new SortedListModel();
+		electivesList = new JList(sortedElectivesList);
+		electivesList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedElectivesList = new JScrollPane(electivesList);
+		scrollSortedElectivesList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedElectivesList.setBounds(93, 206, 500, 110);
+		addCourseWindow.getContentPane().add(scrollSortedElectivesList);
+		electivesList.setVisible(false);
+		scrollSortedElectivesList.setVisible(false);
+		
+		otherCoursesLabel = new JLabel("Other Courses");
+		otherCoursesLabel.setBounds(478, 320, 115, 20);
+		otherCoursesLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		otherCoursesLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		addCourseWindow.getContentPane().add(otherCoursesLabel);
+		otherCoursesLabel.setVisible(false);
+		
+		sortedOtherCoursesList = new SortedListModel();
+		otherCoursesList = new JList(sortedOtherCoursesList);
+		otherCoursesList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedOtherCoursesList = new JScrollPane(otherCoursesList);
+		scrollSortedOtherCoursesList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedOtherCoursesList.setBounds(93, 344, 500, 110);
+		addCourseWindow.getContentPane().add(scrollSortedOtherCoursesList);
+		otherCoursesList.setVisible(false);
+		scrollSortedOtherCoursesList.setVisible(false);
+		
+		proposedScheduleLabel = new JLabel("Proposed Schedule");
+		proposedScheduleLabel.setBounds(1095, 48, 110, 14);
+		proposedScheduleLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		addCourseWindow.add(proposedScheduleLabel);
+		proposedScheduleLabel.setVisible(false);
 
-		courseListLabel = new JLabel("Course List");
-		courseListLabel.setBounds(531, 10, 62, 14);
-		courseListLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-		addCourseWindow.add(courseListLabel);
-		courseListLabel.setVisible(false);
-
-		coursesToAddLabel = new JLabel("Proposed Schedule");
-		coursesToAddLabel.setBounds(1095, 10, 110, 14);
-		coursesToAddLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-		addCourseWindow.add(coursesToAddLabel);
-		coursesToAddLabel.setVisible(false);
-
-		sortedLeftSideList = new SortedListModel();
-		leftSideList = new JList(sortedLeftSideList);
-		leftSideList.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		scrollSortedLeftSideList = new JScrollPane(leftSideList);
-		scrollSortedLeftSideList.setBounds(93, 30, 500, 386);
-		addCourseWindow.add(scrollSortedLeftSideList);
+		sortedPrereqsList = new SortedListModel();
+		prereqsList = new JList(sortedPrereqsList);
+		prereqsList.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		scrollSortedPrereqsList = new JScrollPane(prereqsList);
+		scrollSortedPrereqsList.setBounds(93, 68, 500, 386);
+		addCourseWindow.add(scrollSortedPrereqsList);
 
 		sortedRightSideList = new SortedListModel();
 		rightSideList = new JList(sortedRightSideList);
 		rightSideList.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		scrollSortedRightSideList = new JScrollPane(rightSideList);
 		scrollSortedRightSideList.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		scrollSortedRightSideList.setBounds(705, 30, 500, 386);
+		scrollSortedRightSideList.setBounds(705, 68, 500, 386);
 		addCourseWindow.add(scrollSortedRightSideList);
 
 		JButton addButton = new JButton("Add >>");
 		addButton.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		addButton.setBounds(603, 182, 92, 24);
+		addButton.setBounds(603, 220, 92, 24);
 		addButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {		
+				// If performing an "add" on the prerequisites part of the interface
+				if(isInterfacePageOne()) {
 				@SuppressWarnings("deprecation")
-				Object selected[] = leftSideList.getSelectedValues();
-				addRightList(selected);
-				clearLeftListSelected();
+				Object selectedPrereqs[] = prereqsList.getSelectedValues();
+				addRightList(selectedPrereqs);
+				
+				clearPrereqsListSelected();	
+				}
+				// If performing an "add" on the add courses part of the interface
+				else {
+				@SuppressWarnings("deprecation")
+				Object selectedCoreReqCourses[] = coreRequirementsList.getSelectedValues();
+				addRightList(selectedCoreReqCourses);
+				
+				@SuppressWarnings("deprecation")
+				Object selectedElectives[] = electivesList.getSelectedValues();
+				addRightList(selectedElectives);
+				
+				@SuppressWarnings("deprecation")
+				Object selectedOtherCourses[] = otherCoursesList.getSelectedValues();
+				addRightList(selectedOtherCourses);
+				
+				clearCoreRequirementsListSelected();
+				clearElectivesListSelected();
+				clearOtherCoursesListSelected();
+				}
 			}
 		});
 		addCourseWindow.add(addButton);
 
 		JButton removeButton = new JButton("<< Remove");
 		removeButton.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		removeButton.setBounds(603, 240, 92, 24);
+		removeButton.setBounds(603, 278, 92, 24);
 		removeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				@SuppressWarnings("deprecation")
-				Object selected[] = rightSideList.getSelectedValues();
-				addLeftList(selected);
-				clearRightListSelected();
+				
+				// If performing a "remove" on the prerequisites part of the interface
+				if (isInterfacePageOne()) {
+					@SuppressWarnings("deprecation")
+					Object selectedPrereqs[] = rightSideList.getSelectedValues();
+					addPrereqsList(selectedPrereqs);
+	
+					clearRightListSelected();
+				}
+				
+				// If performing a "remove" on the add courses part of the interface
+				else {
+					@SuppressWarnings("deprecation")
+
+					Object selectedCourses[] = rightSideList.getSelectedValues();
+
+					ArrayList<String> tempCoreRequirements = new ArrayList<String>();
+					ArrayList<String> tempElectives = new ArrayList<String>();
+					ArrayList<String> tempOther = new ArrayList<String>();
+
+					// If CSE Major is selected, checks which course type the removing course is
+					if (isCSEMajor) {
+						for (int i = 0; i < selectedCourses.length; i++) {
+							if (isCourseType(cseCoreRequirements, selectedCourses[i].toString().substring(0, 6)))
+								tempCoreRequirements.add(selectedCourses[i].toString());
+							else if (isCourseType(cseElectives, selectedCourses[i].toString().substring(0, 6)))
+								tempElectives.add(selectedCourses[i].toString());
+							else
+								tempOther.add(selectedCourses[i].toString());
+						}
+					}
+					// If SE Major is selected, checks which course type the removing course is
+					else {
+						for (int i = 0; i < selectedCourses.length; i++) {
+							if (isCourseType(seCoreRequirements, selectedCourses[i].toString().substring(0, 6)))
+								tempCoreRequirements.add(selectedCourses[i].toString());
+							else if (isCourseType(seElectives, selectedCourses[i].toString().substring(0, 6)))
+								tempElectives.add(selectedCourses[i].toString());
+							else
+								tempOther.add(selectedCourses[i].toString());
+						}
+					}
+
+					String[] coreRequirements = new String[tempCoreRequirements.size()];
+					coreRequirements = tempCoreRequirements.toArray(coreRequirements);
+					addCoreRequirementsList(coreRequirements);
+
+					String[] electives = new String[tempElectives.size()];
+					electives = tempElectives.toArray(electives);
+					addElectivesList(electives);
+
+					String[] other = new String[tempOther.size()];
+					other = tempOther.toArray(other);
+					addOtherCoursesList(other);
+
+					clearRightListSelected();
+				}
 			}
 		});
 		addCourseWindow.add(removeButton);
 
 		JButton clearButton = new JButton("Clear");
 		clearButton.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		clearButton.setBounds(603, 211, 92, 24);
+		clearButton.setBounds(603, 249, 92, 24);
 		clearButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				clear();
@@ -198,38 +390,56 @@ public class MainWindow extends JFrame {
 
 		processButton = new JButton("Process Prerequisites");
 		processButton.setFont(new Font("Tahoma", Font.BOLD, 10));
-		processButton.setBounds(705, 421, 245, 23);
+		processButton.setBounds(705, 459, 245, 23);
 		processButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				interfacePageOne = false;
+				
 				boolean error1 = false;
 				boolean error2 = false;
+				boolean error3 = false;
 				String errors = "";
 
 				// Get the contents of each JList, to be used to check prerequisites and for when the interface is run again
 				shortPrereqsPassed = getSubNumPrereqsPassed(rightSideList);
-				longPrereqsPassed = getLongRightSideList(rightSideList);
-				longPrereqCoursesRemaining = getLongLeftSideList(leftSideList);
+				prereqsPassed = getContentsOfJList(rightSideList);
+				prereqCoursesRemaining = getContentsOfJList(prereqsList);
 
+				// Return an error if the student did not enter their major
+				if(!cseMajorBox.isSelected() && !seMajorBox.isSelected()) 
+					error1 = true;
+				if(error1)
+					errors += "\n-     Please enter your major";
+				
+				findMajor(); // Sets your major to boolean variables, for when the interface is run again
+				
+				// Pending which major is selected, the program sets the courses for that major
+				if(isCSEMajor)
+					setCSECourses(arrayListCourses);
+				else
+					setSECourses(arrayListCourses);
+				
 				try {
 					if (getTotalCreditsEarned() < 0 || getTotalCreditsEarned() > 150)
-						error1 = true;
+						error2 = true;
 					else
 						totalCreditsEarned = getTotalCreditsEarned();
 				} catch (Exception ex) {
-					error1 = true;
+					error2 = true;
 				}
-				if (error1)
+				if (error2)
 					errors += "\n-     Please enter a valid number of credits earned";
 
+				// Return an error if the student did not enter their year in school
 				if (!freshmanBox.isSelected() && !sophomoreBox.isSelected() && 
 					!juniorBox.isSelected() && !seniorBox.isSelected())
-					error2 = true;
-				if (error2)
+					error3 = true;
+				if (error3)
 					errors += "\n-     Please enter your year in school";
 
 				yearInSchool(); // Sets your year in school to boolean variables, for when the interface is run again
-
+				
 				if (error1 || error2)
 					JOptionPane.showMessageDialog(null, "The following error(s) occurred:" + errors, " Error Message",
 							JOptionPane.INFORMATION_MESSAGE);
@@ -237,29 +447,59 @@ public class MainWindow extends JFrame {
 				if (!error1 && !error2)
 					prerequisitesFinalized = true;
 
+
 				// When prerequisites are finalized, change the window to accommodate adding courses to the students schedule
 				if (prerequisitesFinalized()) {
-					prereqsListLabel.setVisible(false);
-					passedCoursesLabel.setVisible(false);
-					courseListLabel.setVisible(true);
+					// Disable prerequisites
+					cseMajorBox.setEnabled(false);
+					seMajorBox.setEnabled(false);
 					freshmanBox.setEnabled(false);
 					sophomoreBox.setEnabled(false);
 					juniorBox.setEnabled(false);
 					seniorBox.setEnabled(false);
 					creditsEarned.setEnabled(false);
-					coursesToAddLabel.setVisible(true);
+					
+					// Disable prerequisites course list and name
+					prereqsListLabel.setVisible(false);
+					prereqsList.setVisible(false);
+					scrollSortedPrereqsList.setVisible(false);
+					
+					// Change right side list name
+					passedCoursesLabel.setVisible(false);
+					proposedScheduleLabel.setVisible(true);
+					
+					// Change button enables
 					processButton.setEnabled(false);
 					addCoursesButton.setEnabled(true);
+					
+					// Enable the core requirements, electives and other courses lists
+					coreRequirementsLabel.setVisible(true);
+					coreRequirementsList.setVisible(true);
+					scrollSortedCoreRequirementsList.setVisible(true);
+					electivesLabel.setVisible(true);
+					electivesList.setVisible(true);
+					scrollSortedElectivesList.setVisible(true);
+					otherCoursesLabel.setVisible(true);
+					otherCoursesList.setVisible(true);
+					scrollSortedOtherCoursesList.setVisible(true);
+										
 					repaint();
-					clearLeftListModel();
-					clearRightListModel();
-					addLeftList(CSECourseListToJList(arrayListCourses));
+					clearPrereqsList();
+					clearRightSideList();
+					addCoreRequirementsList(getCoreRequirementCourses());
+					addElectivesList(getElectiveCourses());
+					addOtherCoursesList(getOtherCourses());
 					// If student has already completed this step and the window is run again, update the JList with the correct lists
 					if (addCoursesFinalized()) {
-						clearLeftListModel();
-						clearRightListModel();
-						addLeftList(getLongCSECoursesRemaining());
-						addRightList(getLongProposedSchedule());
+						// Clear anything in the lists
+						clearCoreRequirementsList();
+						clearElectivesList();
+						clearOtherCoursesList();
+						// Add the courses remaining in the courses lists and the student's updated schedule
+						addCoreRequirementsList(getCoreRequirmentCoursesRemaining());
+						addElectivesList(getElectiveCoursesRemaining());
+						addOtherCoursesList(getOtherCoursesRemaining());
+						addRightList(getStringProposedSchedule());
 					}
 				}
 			}
@@ -267,18 +507,20 @@ public class MainWindow extends JFrame {
 		addCourseWindow.add(processButton);
 
 		addCoursesButton = new JButton("Update Schedule");
-		addCoursesButton.setBounds(960, 421, 245, 23);
+		addCoursesButton.setBounds(960, 459, 245, 23);
 		addCoursesButton.setFont(new Font("Tahoma", Font.BOLD, 10));
 		addCoursesButton.setEnabled(false);
 		addCoursesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Gets the contents of the right JList so when the interface is run again, it contains the correct schedule
-				longProposedSchedule = getLongRightSideList(rightSideList);  
-				updateSchedule(longProposedSchedule);	
+				stringProposedSchedule = getContentsOfJList(rightSideList);  
+				updateSchedule(stringProposedSchedule);	
 				// Gets the contents of the left JList so when the interface is run again, it contains the correct CSE course list
-				longCSECoursesRemaining = getLongLeftSideList(leftSideList);
+				coreRequirementCoursesRemaining = getContentsOfJList(coreRequirementsList);
+				electiveCoursesRemaining = getContentsOfJList(electivesList);
+				otherCoursesRemaining = getContentsOfJList(otherCoursesList);
 				addCoursesFinalized = true;
-				addCourses(longProposedSchedule);
+				addCourses(stringProposedSchedule);
 				addCourseWindow.dispose();
 			}
 		});
@@ -287,7 +529,7 @@ public class MainWindow extends JFrame {
 		seniorBox = new JCheckBox("Senior");
 		seniorBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		seniorBox.setHorizontalAlignment(SwingConstants.RIGHT);
-		seniorBox.setBounds(11, 242, 80, 22);
+		seniorBox.setBounds(11, 294, 80, 22);
 		seniorBox.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		seniorBox.setSelected(senior);
 		addCourseWindow.add(seniorBox);
@@ -295,7 +537,7 @@ public class MainWindow extends JFrame {
 		juniorBox = new JCheckBox("Junior");
 		juniorBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		juniorBox.setHorizontalAlignment(SwingConstants.RIGHT);
-		juniorBox.setBounds(11, 216, 80, 22);
+		juniorBox.setBounds(11, 265, 80, 22);
 		juniorBox.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		seniorBox.setSelected(junior);
 		addCourseWindow.add(juniorBox);
@@ -303,7 +545,7 @@ public class MainWindow extends JFrame {
 		sophomoreBox = new JCheckBox("Sophomore");
 		sophomoreBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		sophomoreBox.setHorizontalAlignment(SwingConstants.RIGHT);
-		sophomoreBox.setBounds(11, 190, 80, 22);
+		sophomoreBox.setBounds(11, 235, 80, 22);
 		sophomoreBox.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		seniorBox.setSelected(sophomore);
 		addCourseWindow.add(sophomoreBox);
@@ -311,7 +553,7 @@ public class MainWindow extends JFrame {
 		freshmanBox = new JCheckBox("Freshman");
 		freshmanBox.setHorizontalTextPosition(SwingConstants.LEFT);
 		freshmanBox.setHorizontalAlignment(SwingConstants.RIGHT);
-		freshmanBox.setBounds(11, 164, 80, 22);
+		freshmanBox.setBounds(11, 206, 80, 22);
 		freshmanBox.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		seniorBox.setSelected(freshman);
 		addCourseWindow.add(freshmanBox);
@@ -323,16 +565,91 @@ public class MainWindow extends JFrame {
 		collegeYear.add(seniorBox);
 
 		creditsEarnedLabel = new JLabel("Credits Earned");
-		creditsEarnedLabel.setBounds(97, 421, 71, 23);
+		creditsEarnedLabel.setBounds(97, 459, 71, 23);
 		creditsEarnedLabel.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		addCourseWindow.add(creditsEarnedLabel);
 
 		creditsEarned = new JTextField();
-		creditsEarned.setBounds(178, 422, 30, 20);
+		creditsEarned.setBounds(178, 460, 30, 20);
 		creditsEarned.setHorizontalAlignment(JTextField.CENTER);
 		addCourseWindow.add(creditsEarned);
 
 		addCourseWindow.setVisible(true);
+	}
+	
+	/**
+	 * Traverses through the course list and puts each course into an array for
+	 * either core requirements, electives of other courses, based on the 
+	 * CSE major specifications
+	 * @param courses The array list for courses for a given semester
+	 */
+	public void setCSECourses(ArrayList<Course> courses) {
+		
+		ArrayList<String> tempCSECoreRequirementCourses = new ArrayList<String>();
+		ArrayList<String> tempCSEElectiveCourses = new ArrayList<String>();
+		ArrayList<String> tempCSEOtherCourses = new ArrayList<String>();
+		
+		// Loops through the course list and determines what course type each course is
+		for(int i = 0; i < courses.size(); i++) {
+			if(isCourseType(cseCoreRequirements, courses.get(i).getCourseSubNum()))
+				tempCSECoreRequirementCourses.add(courses.get(i).toDisplay());
+			else if(isCourseType(cseElectives, courses.get(i).getCourseSubNum()))
+				tempCSEElectiveCourses.add(courses.get(i).toDisplay());
+			else
+				tempCSEOtherCourses.add(courses.get(i).toDisplay());
+		}
+		coreRequirementCourses = new String[tempCSECoreRequirementCourses.size()];
+		coreRequirementCourses = tempCSECoreRequirementCourses.toArray(coreRequirementCourses);
+		electiveCourses = new String[tempCSEElectiveCourses.size()];
+		electiveCourses = tempCSEElectiveCourses.toArray(electiveCourses);
+		otherCourses = new String[tempCSEOtherCourses.size()];
+		otherCourses = tempCSEOtherCourses.toArray(otherCourses);
+	}
+	
+	/**
+	 * Traverses through the course list and puts each course into an array for
+	 * either core requirements, electives of other courses, based on the 
+	 * SE major specifications
+	 * @param courses The array list for courses for a given semester
+	 */	
+	public void setSECourses(ArrayList<Course> courses) {
+		
+		ArrayList<String> tempSECoreRequirementCourses = new ArrayList<String>();
+		ArrayList<String> tempSEElectiveCourses = new ArrayList<String>();
+		ArrayList<String> tempSEOtherCourses = new ArrayList<String>();
+		
+		// Loops through the course list and determines what course type each course is
+		for(int i = 0; i < courses.size(); i++) {
+			if(isCourseType(seCoreRequirements, courses.get(i).getCourseSubNum()))
+				tempSECoreRequirementCourses.add(courses.get(i).toDisplay());
+			else if(isCourseType(seElectives, courses.get(i).getCourseSubNum()))
+				tempSEElectiveCourses.add(courses.get(i).toDisplay());
+			else
+				tempSEOtherCourses.add(courses.get(i).toDisplay());
+		}
+		coreRequirementCourses = new String[tempSECoreRequirementCourses.size()];
+		coreRequirementCourses = tempSECoreRequirementCourses.toArray(coreRequirementCourses);
+		electiveCourses = new String[tempSEElectiveCourses.size()];
+		electiveCourses = tempSEElectiveCourses.toArray(electiveCourses);
+		otherCourses = new String[tempSEOtherCourses.size()];
+		otherCourses = tempSEOtherCourses.toArray(otherCourses);
+	}
+	
+	/**
+	 * Determines if a course is either a core requirement, elective or other course for
+	 * either the CSE or SE department.
+	 * @param typeOfCourses An array containing the courses for either core requirements,
+	 * 						electives, or other courses
+	 * @param courseSubNum The course's course subject + course number
+	 * @return Returns true if a course is a certain course type for either CSE or SE major
+	 */
+	public boolean isCourseType(String[] typeOfCourses, String courseSubNum) {
+		
+		for(int i = 0; i < typeOfCourses.length; i++) {
+			if(typeOfCourses[i].equals(courseSubNum))
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -389,9 +706,10 @@ public class MainWindow extends JFrame {
 					else
 						canAdd = "";
 				} else { 
-					// Prerequisites have not been satisfied: remove from schedule, add to CSE course list and get the error message
+					// Prerequisites have not been satisfied: remove from schedule, add
+					// to the certain CSE or SE course type list and get the error message
 					removeFromProposedSchedule(courseToAdd);
-					addToCSECourses(courseToAdd);
+					addToLists(courseToAdd);
 					canAdd = (checkPrereqs(courseSubNum, course.getCoursePrereqs(), getShortPrereqsPassed()));
 				}
 			} else {																// Course does not have prerequisites
@@ -445,6 +763,7 @@ public class MainWindow extends JFrame {
 		
 	}
 
+	// Used for testing; can be deleted for final product
 	public void displayProposedSchedule() {
 		
 		String print = "";
@@ -772,7 +1091,7 @@ public class MainWindow extends JFrame {
 	public void removeFromProposedSchedule(Course courseToRemove) {
 
 		// Convert the SortedListModel proposed schedule to an ArrayList (easier to remove an element)
-		ArrayList<String> tempProposedSchedule = new ArrayList<String>(Arrays.asList(getLongProposedSchedule()));
+		ArrayList<String> tempProposedSchedule = new ArrayList<String>(Arrays.asList(getStringProposedSchedule()));
 
 		// Remove the specified course from the student's proposed schedule
 		for (int i = 0; i < proposedSchedule.size(); i++) {
@@ -787,8 +1106,8 @@ public class MainWindow extends JFrame {
 		}
 
 		// Convert the temporary proposed schedule for the SortedListModel back into an array and set it
-		longProposedSchedule = new String[tempProposedSchedule.size()];
-		longProposedSchedule = tempProposedSchedule.toArray(longProposedSchedule);
+		stringProposedSchedule = new String[tempProposedSchedule.size()];
+		stringProposedSchedule = tempProposedSchedule.toArray(stringProposedSchedule);
 
 	}
 
@@ -796,65 +1115,66 @@ public class MainWindow extends JFrame {
 	 * Adds a course whose prerequisites have not been met back into the CSE course list for a given semester
 	 * @param courseToAdd The course to be added
 	 */
-	public void addToCSECourses(Course courseToAdd) {
+	public void addToLists(Course courseToAdd) {
 
-		ArrayList<String> tempCoursesRemaining = new ArrayList<String>(Arrays.asList(getLongCSECoursesRemaining()));
+		ArrayList<String> temp;
+		String courseDisplay = courseToAdd.toDisplay();
 
-		// Add the course to the temporary ArrayList and then convert it back to an array to be put into the CSE course list
-		tempCoursesRemaining.add(courseToAdd.toDisplay());
-		longCSECoursesRemaining = new String[tempCoursesRemaining.size()];
-		longCSECoursesRemaining = tempCoursesRemaining.toArray(longCSECoursesRemaining);
-
-	}
-
-	/**
-	 * Converts the CSE course list in the ArrayList to an array for the SortedListModel
-	 * @param courseList An ArrayList of CSE courses
-	 * @return
-	 */
-	public String[] CSECourseListToJList(ArrayList<Course> courseList) {
-
-		String[] semesterCourseList = new String[courseList.size()];
-
-		for (int i = 0; i < courseList.size(); i++) {
-			semesterCourseList[i] = courseList.get(i).toDisplay();
+		// CSE major is selected, and the student didn't pass the prerequisites, add it to the correct list
+		if (isCSEMajor) {
+			if (isCourseType(cseCoreRequirements, courseToAdd.getCourseSubNum())) {
+				temp = new ArrayList<String>(Arrays.asList(getCoreRequirmentCoursesRemaining()));
+				temp.add(courseDisplay);
+				coreRequirementCoursesRemaining = new String[temp.size()];
+				coreRequirementCoursesRemaining = temp.toArray(coreRequirementCoursesRemaining);
+			} else if (isCourseType(cseElectives, courseToAdd.getCourseSubNum())) {
+				temp = new ArrayList<String>(Arrays.asList(getElectiveCoursesRemaining()));
+				temp.add(courseDisplay);
+				electiveCoursesRemaining = new String[temp.size()];
+				electiveCoursesRemaining = temp.toArray(electiveCoursesRemaining);
+			} else {
+				temp = new ArrayList<String>(Arrays.asList(getOtherCoursesRemaining()));
+				temp.add(courseDisplay);
+				otherCoursesRemaining = new String[temp.size()];
+				otherCoursesRemaining = temp.toArray(otherCoursesRemaining);
+			}
 		}
-		return semesterCourseList;
-		
+		// SE major is selected, and the student didn't pass the prerequisites, add it to the correct list
+		else {
+			if (isCourseType(seCoreRequirements, courseToAdd.getCourseSubNum())) {
+				temp = new ArrayList<String>(Arrays.asList(getCoreRequirmentCoursesRemaining()));
+				temp.add(courseDisplay);
+				coreRequirementCoursesRemaining = new String[temp.size()];
+				coreRequirementCoursesRemaining = temp.toArray(coreRequirementCoursesRemaining);
+			} else if (isCourseType(seElectives, courseToAdd.getCourseSubNum())) {
+				temp = new ArrayList<String>(Arrays.asList(getElectiveCoursesRemaining()));
+				temp.add(courseDisplay);
+				electiveCoursesRemaining = new String[temp.size()];
+				electiveCoursesRemaining = temp.toArray(electiveCoursesRemaining);
+			} else {
+				temp = new ArrayList<String>(Arrays.asList(getOtherCoursesRemaining()));
+				temp.add(courseDisplay);
+				otherCoursesRemaining = new String[temp.size()];
+				otherCoursesRemaining = temp.toArray(otherCoursesRemaining);
+			}
+		}
 	}
 
 	/**
 	 * Get the contents of the right side of the SortedListModel
-	 * @param rightSideList The JList on the right
+	 * @param list The JList on the right
 	 * @return An array containing the contents of the JList
 	 */
-	public String[] getLongRightSideList(JList rightSideList) {
+	public String[] getContentsOfJList(JList list) {
 
-		ListModel model = rightSideList.getModel();
-		String[] rightSide = new String[model.getSize()];
+		ListModel model = list.getModel();
+		String[] contentsOfList = new String[model.getSize()];
 
 		for (int i = 0; i < model.getSize(); i++) {
 			Object o = model.getElementAt(i);
-			rightSide[i] = o.toString();
+			contentsOfList[i] = o.toString();
 		}
-		return rightSide;
-	}
-
-	/**
-	 * Get the contents of the left side of the SortedListModel
-	 * @param leftSideList The JList on the left
-	 * @return An array containing the contents of the JList
-	 */
-	public static String[] getLongLeftSideList(JList leftSideList) {
-
-		ListModel model = leftSideList.getModel();
-		String[] leftSide = new String[model.getSize()];
-
-		for (int i = 0; i < model.getSize(); i++) {
-			Object o = model.getElementAt(i);
-			leftSide[i] = o.toString();
-		}
-		return leftSide;
+		return contentsOfList;
 	}
 
 	/**
@@ -898,51 +1218,108 @@ public class MainWindow extends JFrame {
 		junior = juniorBox.isSelected();
 		senior = seniorBox.isSelected();
 	}
+	
+	/** Set the state of the prerequisite interface for when the student reruns the interface */
+	public void findMajor() {
+		isCSEMajor = cseMajorBox.isSelected();
+		isSEMajor = seMajorBox.isSelected();
+	}
 
 	/** Clears the contents back to their original state in the process prerequisites interface. */
 	public void clear() {
-		if (prerequisitesFinalized()) {
-			addLeftList(sortedRightSideList);
-			clearRightListModel();
+		if (!isInterfacePageOne()) {
+			addCoreRequirementsList(getCoreRequirementCourses());
+			addElectivesList(getElectiveCourses());
+			addOtherCoursesList(getOtherCourses());
+			clearRightSideList();
 		} else {
-			addLeftList(sortedRightSideList);
-			clearRightListModel();
+			addPrereqsList(sortedRightSideList);
+			clearRightSideList();
 			collegeYear.clearSelection();
+			major.clearSelection();
 			creditsEarned.setText("");
+			prerequisitesFinalized = false;
 			repaint();
 		}
 	}
 
-	public String[] getShortPrereqsPassed() 								{	return shortPrereqsPassed;							}
-	public String[] getLongPrereqsPassed() 									{	return longPrereqsPassed;							}
-	public String[] getLongPrereqsRemaining() 								{	return longPrereqCoursesRemaining;					}	
-	public String[] getLongProposedSchedule() 								{	return longProposedSchedule;						}
-	public String[] getLongCSECoursesRemaining() 							{	return longCSECoursesRemaining;						}
-	public boolean prerequisitesFinalized() 								{	return prerequisitesFinalized;						}
-	public boolean addCoursesFinalized() 									{	return addCoursesFinalized;							}
-	public void setPrerequisitesFinalized(boolean finalized)				{	this.prerequisitesFinalized = finalized;			}
-	public void setAddCoursesFinalized(boolean finalized)					{	this.addCoursesFinalized = finalized;				}
-	public ArrayList<Course> getProposedSchedule() 							{	return proposedSchedule;							}
-	public void setProposedSchedule(ArrayList<Course> schedule) 			{	this.proposedSchedule = schedule;					}
+	public boolean isCSEMajor()												{ 	return isCSEMajor;							}
+	public boolean isSEMajor()												{ 	return isSEMajor;							}
+	public String[] getShortPrereqsPassed() 								{	return shortPrereqsPassed;					}
+	public String[] getPrereqsPassed() 										{	return prereqsPassed;						}
+	public String[] getPrereqsRemaining() 									{	return prereqCoursesRemaining;				}	
+	public String[] getStringProposedSchedule() 							{	return stringProposedSchedule;				}
+	public String[] getCoreRequirementCourses() 							{	return coreRequirementCourses;				}
+	public String[] getElectiveCourses() 									{	return electiveCourses;						}
+	public String[] getOtherCourses() 										{	return otherCourses;						}
+	public String[] getCoreRequirmentCoursesRemaining()						{ 	return coreRequirementCoursesRemaining;		}
+	public String[] getElectiveCoursesRemaining()							{	return electiveCoursesRemaining;			}
+	public String[] getOtherCoursesRemaining()								{	return otherCoursesRemaining;				}
+	public boolean isInterfacePageOne()										{	return interfacePageOne;					}
+	public boolean prerequisitesFinalized() 								{	return prerequisitesFinalized;				}
+	public boolean addCoursesFinalized() 									{	return addCoursesFinalized;					}
+	public void setPrerequisitesFinalized(boolean finalized)				{	this.prerequisitesFinalized = finalized;	}
+	public void setAddCoursesFinalized(boolean finalized)					{	this.addCoursesFinalized = finalized;		}
+	public ArrayList<Course> getProposedSchedule() 							{	return proposedSchedule;					}
+	public void setProposedSchedule(ArrayList<Course> schedule) 			{	this.proposedSchedule = schedule;			}
 
 	// ============================================================  SORTED LIST MODEL METHODS
 
-	public void clearLeftListModel() 										{	sortedLeftSideList.clear();							}
-	public void clearRightListModel() 										{	sortedRightSideList.clear();						}
-	public void addLeftList(ListModel newValue) 							{	fillJListModel(sortedLeftSideList, newValue);		}
-	public void addLeftList(Object newValue[]) 								{	fillJListModel(sortedLeftSideList, newValue);		}
-	public void addRightList(ListModel newValue) 							{	fillJListModel(sortedRightSideList, newValue);		}
-	public void addRightList(Object newValue[]) 							{	fillJListModel(sortedRightSideList, newValue);		}
-	private void fillJListModel(SortedListModel model, Object newValues[]) 	{	model.addAll(newValues);							}
+	public void clearPrereqsList() 											{	sortedPrereqsList.clear();								}
+	public void clearCoreRequirementsList() 								{	sortedCoreRequirementsList.clear();						}
+	public void clearElectivesList() 										{	sortedElectivesList.clear();							}
+	public void clearOtherCoursesList() 									{	sortedOtherCoursesList.clear();							}
+	public void clearRightSideList() 										{	sortedRightSideList.clear();							}
+	public void addPrereqsList(ListModel newValue) 							{	fillJListModel(sortedPrereqsList, newValue);			}
+	public void addPrereqsList(Object newValue[]) 							{	fillJListModel(sortedPrereqsList, newValue);			}
+	public void addCoreRequirementList(ListModel newValue) 					{	fillJListModel(sortedCoreRequirementsList, newValue);	}
+	public void addCoreRequirementsList(Object newValue[]) 					{	fillJListModel(sortedCoreRequirementsList, newValue);	}
+	public void addElectivesList(ListModel newValue) 						{	fillJListModel(sortedElectivesList, newValue);			}
+	public void addElectivesList(Object newValue[]) 						{	fillJListModel(sortedElectivesList, newValue);			}
+	public void addOtherCoursesList(ListModel newValue) 					{	fillJListModel(sortedOtherCoursesList, newValue);		}
+	public void addOtherCoursesList(Object newValue[]) 						{	fillJListModel(sortedOtherCoursesList, newValue);		}
+	public void addRightList(ListModel newValue) 							{	fillJListModel(sortedRightSideList, newValue);			}
+	public void addRightList(Object newValue[]) 							{	fillJListModel(sortedRightSideList, newValue);			}
+	public void fillJListModel(SortedListModel model, Object newValues[]) 	{	model.addAll(newValues);								}
 
-	public void setLeftList(ListModel newValue) {
-		clearLeftListModel();
-		addLeftList(newValue);
+	public void setPrereqsList(ListModel newValue) {
+		clearPrereqsList();
+		addPrereqsList(newValue);
+	}
+	
+	public void setPrereqsList(Object newValue[]) {
+		clearPrereqsList();
+		addPrereqsList(newValue);
 	}
 
-	public void setLeftList(Object newValue[]) {
-		clearLeftListModel();
-		addLeftList(newValue);
+	public void setCoreRequirementsList(Object newValue[]) {
+		clearCoreRequirementsList();
+		addCoreRequirementsList(newValue);
+	}
+	
+	public void setCoreRequirementsList(ListModel newValue) {
+		clearCoreRequirementsList();
+		addCoreRequirementList(newValue);
+	}
+
+	public void setElectivesList(Object newValue[]) {
+		clearElectivesList();
+		addElectivesList(newValue);
+	}
+	
+	public void setElectivesList(ListModel newValue) {
+		clearElectivesList();
+		addElectivesList(newValue);
+	}
+
+	public void setOtherCoursesList(Object newValue[]) {
+		clearOtherCoursesList();
+		addOtherCoursesList(newValue);
+	}
+	
+	public void setOtherCoursesList(ListModel newValue) {
+		clearOtherCoursesList();
+		addOtherCoursesList(newValue);
 	}
 
 	private void fillJListModel(SortedListModel model, ListModel newValues) {
@@ -952,13 +1329,40 @@ public class MainWindow extends JFrame {
 		}
 	}
 
-	private void clearLeftListSelected() {
+	private void clearPrereqsListSelected() {
 		@SuppressWarnings("deprecation")
-		Object selected[] = leftSideList.getSelectedValues();
+		Object selected[] = prereqsList.getSelectedValues();
 		for (int i = selected.length - 1; i >= 0; --i) {
-			sortedLeftSideList.removeElement(selected[i]);
+			sortedPrereqsList.removeElement(selected[i]);
 		}
-		leftSideList.getSelectionModel().clearSelection();
+		prereqsList.getSelectionModel().clearSelection();
+	}
+	
+	private void clearCoreRequirementsListSelected() {
+		@SuppressWarnings("deprecation")
+		Object selected[] = coreRequirementsList.getSelectedValues();
+		for (int i = selected.length - 1; i >= 0; --i) {
+			sortedCoreRequirementsList.removeElement(selected[i]);
+		}
+		coreRequirementsList.getSelectionModel().clearSelection();
+	}
+	
+	private void clearElectivesListSelected() {
+		@SuppressWarnings("deprecation")
+		Object selected[] = electivesList.getSelectedValues();
+		for (int i = selected.length - 1; i >= 0; --i) {
+			sortedElectivesList.removeElement(selected[i]);
+		}
+		electivesList.getSelectionModel().clearSelection();
+	}
+	
+	private void clearOtherCoursesListSelected() {
+		@SuppressWarnings("deprecation")
+		Object selected[] = otherCoursesList.getSelectedValues();
+		for (int i = selected.length - 1; i >= 0; --i) {
+			sortedOtherCoursesList.removeElement(selected[i]);
+		}
+		otherCoursesList.getSelectionModel().clearSelection();
 	}
 
 	private void clearRightListSelected() {
@@ -975,5 +1379,4 @@ public class MainWindow extends JFrame {
 		MainWindow window = new MainWindow();
 		
 	}
-	
 }
