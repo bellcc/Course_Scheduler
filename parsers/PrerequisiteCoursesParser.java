@@ -1,22 +1,23 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.io.File;
 
-public class PrerequisiteCoursesParser {
+public class PrereqsCourseTypeParser {
 
-	public static String[] parsePrereqCoursesFile(File file) throws FileNotFoundException {
+	public static String[] parseCourses(File file) throws FileNotFoundException {
 		
 		ArrayList<String> temp = new ArrayList<String>();
 		Scanner input = new Scanner(file);
 		
 		while(input.hasNextLine()) {
-			String course = input.nextLine();
-			temp.add(course);
+			String courseSubNum = input.nextLine();
+			temp.add(courseSubNum);
 		}
 		
-		String[] prerequisiteCourses = new String[temp.size()];
-		prerequisiteCourses = temp.toArray(prerequisiteCourses);
-		return prerequisiteCourses;
+		String[] courses = new String[temp.size()];
+		courses = temp.toArray(courses);
+		return courses;
+		
 	}
 }
