@@ -26,6 +26,7 @@ public class MainWindow extends JFrame {
 	private static String[] seCoreRequirements;
 	private static String[] seElectives;
 	private ArrayList<Course> arrayListCourses;
+	private static ArrayList<CoursePrerequisites> coursePrerequisites;
 	private static ArrayList<Course> proposedSchedule = new ArrayList<Course>();
 
 	private String[] shortPrereqsPassed;
@@ -84,31 +85,31 @@ public class MainWindow extends JFrame {
 	private ButtonGroup major;
 
 	public MainWindow() throws FileNotFoundException {
-		getPrereqCourses();
+		getPrereqCourseNames();
+		getCoursePrerequisites();
 		getCourses();
 		getCourseTypes();
 		setUpMainWindow();
 	}
 
 	/**
-	 * Gets the prerequisites for CSE and SE courses in a course 
-	 * subject + course number format
+	 * Gets a list of every prerequisite for CSE and SE undergrad courses.
 	 * @throws FileNotFoundException
 	 */
-	private void getPrereqCourses() throws FileNotFoundException {
+	private void getPrereqCourseNames() throws FileNotFoundException {
 		File file = new File("Prerequisite Courses.txt");
 		prereqCourses = PrereqsCourseTypeParser.parseCourses(file);
 
 	}
-
+	
 	/**
-	 * Gets the courses from the .csv file and returns the course
-	 * objects in an ArrayList
+	 * Gets the prerequisites for each CSE and SE undergrad course in the
+	 * course subject + course number format.
 	 * @throws FileNotFoundException
 	 */
-	private void getCourses() throws FileNotFoundException {
-		File file = new File("CSECourses.csv");
-		arrayListCourses = CourseParser.parseFile(file);
+	public static void getCoursePrerequisites() throws FileNotFoundException {
+		File file = new File("CoursePrerequisites.txt");
+		coursePrerequisites = CoursePrerequisitesParser.parseCourses(file);
 	}
 	
 	/**
@@ -126,6 +127,16 @@ public class MainWindow extends JFrame {
 		seCoreRequirements = PrereqsCourseTypeParser.parseCourses(seCore);
 		seElectives = PrereqsCourseTypeParser.parseCourses(seE);
 		}
+
+	/**
+	 * Gets the courses from the .csv file and returns the course
+	 * objects in an ArrayList
+	 * @throws FileNotFoundException
+	 */
+	private void getCourses() throws FileNotFoundException {
+		File file = new File("CSECourses.csv");
+		arrayListCourses = CourseParser.parseFile(file);
+	}
 
 	private void setUpMainWindow() { // ============================================================== HOMEPAGE FUNCTIONALITY
 
@@ -695,30 +706,36 @@ public class MainWindow extends JFrame {
 		String courseSubNum = courseToAdd.getCourseSubNum();						// Get the course's subject and number
 		String courseDisplayName = courseToAdd.toDisplay();							// Get the display name for the course to be added
 		String canAdd = "";
-		enumCoursePreReqs course;													// The enum for the course to be added
-		try {
-			course = enumCoursePreReqs.valueOf(courseSubNum);                     	// Creates an enum variable for the course
-			if (course.hasPrerequisites()) {										// Checks whether a course has prerequisites
-				// Checks whether or not the prerequisites have been satisfied
-				if (checkPrereqs(courseSubNum, course.getCoursePrereqs(), getShortPrereqsPassed()).equals("")) {
-					if (alreadySignedUp(getProposedSchedule(), courseDisplayName))
-						canAdd = "Duplicate";
-					else
-						canAdd = "";
-				} else { 
-					// Prerequisites have not been satisfied: remove from schedule, add
-					// to the certain CSE or SE course type list and get the error message
-					removeFromProposedSchedule(courseToAdd);
-					addToLists(courseToAdd);
-					canAdd = (checkPrereqs(courseSubNum, course.getCoursePrereqs(), getShortPrereqsPassed()));
-				}
-			} else {																// Course does not have prerequisites
+		CoursePrerequisites coursePrereqs = new CoursePrerequisites();
+		
+		for(int i = 0; i < coursePrerequisites.size(); i++) {
+			if(coursePrerequisites.get(i).getCourseSubNum().equals(courseSubNum)) {
+				coursePrereqs = coursePrerequisites.get(i);
+			}
+		}
+	
+		if (coursePrereqs.hasPrerequisites()) {										// Checks whether a course has prerequisites
+			// Checks whether or not the prerequisites have been satisfied
+			if (checkPrereqs(courseSubNum, coursePrereqs.getPrerequisitesCourses(), getShortPrereqsPassed()).equals("")) {
 				if (alreadySignedUp(getProposedSchedule(), courseDisplayName))
 					canAdd = "Duplicate";
 				else
 					canAdd = "";
+			} 
+			else { 
+				// Prerequisites have not been satisfied: remove from schedule, add
+				// to the certain CSE or SE course type list and get the error message
+				removeFromProposedSchedule(courseToAdd);
+				addToLists(courseToAdd);
+				canAdd = (checkPrereqs(courseSubNum, coursePrereqs.getPrerequisitesCourses(), getShortPrereqsPassed()));
 			}
-		} catch (IllegalArgumentException e) {}
+		} 
+		else {																// Course does not have prerequisites
+			if (alreadySignedUp(getProposedSchedule(), courseDisplayName))
+				canAdd = "Duplicate";
+			else
+				canAdd = "";
+		}
 		return canAdd;
 	}
 
@@ -810,7 +827,7 @@ public class MainWindow extends JFrame {
 	 * @return An empty string if the prerequisites have been satisfied to sign up for a courses OR
 			   an error message string containing the necessary prerequisites needed to sign up for that class.
 	 */
-	public String checkPrereqs(String courseSubNum, String[] prereqs, String[] prereqsPassed) {
+	public String checkPrereqs(String courseSubNum, ArrayList<String> prereqs, String[] prereqsPassed) {
 
 		boolean firstCond = false;
 		boolean secondCond = false;
@@ -931,21 +948,21 @@ public class MainWindow extends JFrame {
 				errors += "\n-     MTH245 - Differential Equations for Engineers OR\n-     MTH347 - Differential Equations";
 
 			// Condition 2 - Check if CSE102 AND STA368 have already been passed
-			for (int i = 0; i < prereqs.length; i++) {
+			for (int i = 0; i < prereqs.size(); i++) {
 				for (int j = 0; j < prereqsPassed.length; j++) {
-					if (prereqs[i].equals(prereqsPassed[j])) {
+					if (prereqs.get(i).equals(prereqsPassed[j])) {
 						found = true;
 						courseCount++;
 					}
 				}
 				if (!found) {
 					for (int k = 0; k < prereqCourses.length; k++) {
-						if (prereqs[i].equals(prereqCourses[k].substring(0, 6)))
+						if (prereqs.get(i).equals(prereqCourses[k].substring(0, 6)))
 							errors += "\n-     " + prereqCourses[k];
 					}
 				}
 				found = false;
-				if (courseCount == prereqs.length)
+				if (courseCount == prereqs.size())
 					secondCond = true;
 			}
 			// If conditions have not been met, return the error message, else return an empty string
@@ -967,21 +984,21 @@ public class MainWindow extends JFrame {
 
 			// Condition 2 - Check if CSE201 AND CSE274 have already been passed for CSE448
 			// Condition 2 - Check if CSE448 has already been passed for CSE449
-			for (int i = 0; i < prereqs.length; i++) {
+			for (int i = 0; i < prereqs.size(); i++) {
 				for (int j = 0; j < prereqsPassed.length; j++) {
-					if (prereqs[i].equals(prereqsPassed[j])) {
+					if (prereqs.get(i).equals(prereqsPassed[j])) {
 						found = true;
 						courseCount++;
 					}
 				}
 				if (!found) {
 					for (int k = 0; k < prereqCourses.length; k++) {
-						if (prereqs[i].equals(prereqCourses[k].substring(0, 6)))
+						if (prereqs.get(i).equals(prereqCourses[k].substring(0, 6)))
 							errors += "\n-     " + prereqCourses[k];
 					}
 				}
 				found = false;
-				if (courseCount == prereqs.length)
+				if (courseCount == prereqs.size())
 					secondCond = true;
 			}
 
@@ -1057,9 +1074,9 @@ public class MainWindow extends JFrame {
 		   requirements (OR's or concurrent registration) */
 		else {
 			// Loops through the courses prerequisites and checks if the student has passes those courses
-			for (int i = 0; i < prereqs.length; i++) {
+			for (int i = 0; i < prereqs.size(); i++) {
 				for (int j = 0; j < prereqsPassed.length; j++) {
-					if (prereqs[i].equals(prereqsPassed[j])) {
+					if (prereqs.get(i).equals(prereqsPassed[j])) {
 						found = true;
 						courseCount++;
 					}
@@ -1068,14 +1085,14 @@ public class MainWindow extends JFrame {
 				// prerequisites have not been met
 				if (!found) {
 					for (int k = 0; k < prereqCourses.length; k++) {
-						if (prereqs[i].equals(prereqCourses[k].substring(0, 6)))
+						if (prereqs.get(i).equals(prereqCourses[k].substring(0, 6)))
 							errors += "\n-     " + prereqCourses[k];
 					}
 				}
 				found = false; // Reset found to false in case of multiple prerequisites for a course
 			}
 			// If conditions have not been met, return the error message, else return an empty string
-			if (courseCount != prereqs.length)
+			if (courseCount != prereqs.size())
 				return errors;
 			else
 				return "";
