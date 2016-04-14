@@ -202,24 +202,20 @@ public class Client {
 
 		int st = 0;
 		int et = 0;
-//		int ext = 0;
 
 		try {
 
 			st = Integer.parseInt(parts[14]);
 			et = Integer.parseInt(parts[15]);
-//			ext = Integer.parseInt(parts[17]);
 
 		}
 		catch(NumberFormatException e) {
 
 			st = -1;
 			et = -1;
-//			ext = -1;
 
 		}
 
-//		char exam_day = parts[16].charAt(0);
 
 
 		Course course = new Course(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], parts[8], parts[9], parts[10], parts[11], parts[12], parts[13], st, et);
