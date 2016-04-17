@@ -3,133 +3,93 @@ import java.util.ArrayList;
 
 public class CoursePrerequisites {
 	
-	private String             courseSubNum;
-	private String             academicYearNeeded;
-	private int                creditsNeeded;
+	private String             courseNum;
+	private String             academicYear;
+	private int                credits;
 	private ArrayList<String>  andPrereqCourses;
 	private ArrayList<String>  orPrereqCourses;
 	private ArrayList<String>  concurrentCourses;
 	
 	public CoursePrerequisites() {
 	
-		this.courseSubNum         = "";
-		this.academicYearNeeded   = "";
-		this.creditsNeeded        = 0;
+		this.courseNum            = "";
+		this.academicYear         = "";
+		this.credits              = 0;
 		this.andPrereqCourses     = new ArrayList<String>();
 		this.orPrereqCourses      = new ArrayList<String>();
 		this.concurrentCourses    = new ArrayList<String>();
 
 	}
 
-	public void setCourseSubNum(String courseSubNum) {
+	public void setCourseNum (String courseNum) {
 
-		this.courseSubNum = courseSubNum;
-
-	}
-
-	public String getCourseSubNum()	{ 
-
-		return courseSubNum;
-	}
-
-	public void setAcademicYearNeeded(String academicYear) {
-
-		this.academicYearNeeded = academicYear;
+		this.courseNum = courseNum;
 
 	}
 
-	public String getAcademicYearNeeded() {
+	public void setAcademicYear (String academicYear) {
 
-		return academicYearNeeded;
-
-	}
-
-	public boolean hasAcademicYearPrereq(){
-
-		return (!getAcademicYearNeeded().equals(""));
-
-	}
-	
-	public void setCreditsNeeded(int creditsNeeded)	{
-
-		this.creditsNeeded = creditsNeeded;
+		this.academicYear = academicYear;
 
 	}
 
-	public int getCreditsNeeded() {
+	public void setCredits(int credits) {
 
-		return creditsNeeded;
-
-	}
-
-	public boolean hasCreditsNeededPrereq()	{
-
-		return (getCreditsNeeded() != 0);
-
-	}
-	
-	public void setAndPrereqCourses(ArrayList<String> andPrerequisites) {
-
-		this.andPrereqCourses = andPrerequisites;
-
-	}
-	
-	public ArrayList<String> getAndPrereqCourses() {
-
-		return andPrereqCourses;
+		this.credits = credits;
 
 	}
 
-	public boolean hasAndPrerequisites() {
+	public void setAndPreReqCourses (ArrayList<String> andPrereqCourses) {
 
-		return (!andPrereqCourses.isEmpty());
-
-	}
-	
-	public void setOrPrereqCourses(ArrayList<String> orPrerequisites) {
-
-		this.orPrereqCourses = orPrerequisites;
+		this.andPrereqCourses = andPrereqCourses;
 
 	}
 
-	public ArrayList<String> getOrPrereqCourses() {
+	public void setOrPreReqCourses (ArrayList<String> orPrereqCourses) {
 
-		return orPrereqCourses;
-
-	}
-
-	public boolean hasOrPrerequisites() {
-
-		return (!orPrereqCourses.isEmpty());
-
-	}
-	
-	public void setConcurrentPrereqCourses(ArrayList<String> concurrentPrereqs) {
-
-		this.concurrentCourses = concurrentPrereqs;
+		this.orPrereqCourses = orPrereqCourses;
 
 	}
 
-	public ArrayList<String> getConncurrentPrereqCourses() {
+	public void setConcurrentCourses (ArrayList<String> concurrentCourses) {
 
-		return concurrentCourses;
+		this.concurrentCourses = concurrentCourses;
+
+	}
+
+	public String getCourseNum () {
+
+		return this.courseNum;
 
 	}
 
-	public boolean hasConcurrentPrereqs() {
+	public String getAcademicYear () {
 
-		return (!concurrentCourses.isEmpty());
+		return this.academicYear;
 
 	}
-	
-	public boolean hasPrerequisites() {
 
-		if(hasAcademicYearPrereq()) return true;
-		if(hasCreditsNeededPrereq()) return true;
-		if(hasAndPrerequisites()) return true;
-		if(hasOrPrerequisites()) return true;
-		if(hasConcurrentPrereqs()) return true;
-		return false;
+	public int getCredits () {
+
+		return this.credits;
+
+	}
+
+	public ArrayList<String> getAndPreReqCourses () {
+
+		return this.andPrereqCourses;
+
+	}
+
+	public ArrayList<String> getOrPreReqCourses () {
+
+		return this.orPrereqCourses;
+
+	}
+
+	public ArrayList<String> getConcurrentCourses () {
+
+		return this.concurrentCourses;
 
 	}
 
@@ -139,7 +99,14 @@ public class CoursePrerequisites {
 	 */
 	public String toString() {
 
-		String str = "[Course Number: " + courseSubNum + ", Academic Year: " + academicYearNeeded + ", Credits: " + creditsNeeded + ", And Prerequisites: " + toString(andPrereqCourses) + ", Or Prerequisistes: " + toString(orPrereqCourses) + ", Corequisistes: " + toString(concurrentCourses) + " ]";
+		String str = "[ " +
+			     "Course Number: "       + courseNum                   +
+			     ", Academic Year: "     + academicYear                +
+			     ", Credits: "           + credits                     +
+			     ", And Prerequisites: " + toString(andPrereqCourses)  +
+			     ", Or Prerequisistes: " + toString(orPrereqCourses)   +
+                             ", Corequisistes: "     + toString(concurrentCourses) +
+			     " ]";
 
 		return str;
 
