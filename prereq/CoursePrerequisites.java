@@ -1,4 +1,10 @@
 
+/**
+ * Author          : Christopher Bell
+ * Date            : 04-16-2016
+ * Info            : Class that represents a course's prerequisites
+ */
+
 import java.util.ArrayList;
 
 public class CoursePrerequisites {
