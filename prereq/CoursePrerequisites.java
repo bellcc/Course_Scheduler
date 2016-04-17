@@ -99,6 +99,30 @@ public class CoursePrerequisites {
 
 	}
 
+	public boolean hasCredits() {
+
+		if (this.credits != 0) {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	public boolean hasAcademicYear () {
+
+		if(!this.academicYear.equals("")) {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
 	/**
 	 * This method returns a string representation of a CoursePrerequisites object.
 	 * @return The string representation.
