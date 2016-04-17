@@ -159,6 +159,78 @@ public class CheckPrerequisites {
 	}
 
 	/**
+	 * This method checks if there is a credit hour minimum for a course.
+	 * @param course The course you are interested in testing.
+	 * @return Returns true if there is a minumum credit hour requirement and false otherwise.
+	 */
+	public boolean checkCreditRequirement (String course) {
+
+		CoursePrerequisites temp = getRequirements(course);
+
+		int credits = temp.getCredits();
+
+		if(credits != 0) {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * This method returns the minimum credit hours that must be taken for a class.
+	 * @param course The course you want to know the minumum credit hour requirement of.
+	 * @return The number of credit hours that must be taken to take a course.
+	 */
+	public int retrieveCreditRequirement (String course) {
+
+		CoursePrerequisites temp = getRequirements(course);
+
+		int credits = temp.getCredits();
+
+		return credits;
+
+	}
+
+	/**
+	 * This method checks if there is an academic year requirement for a course.
+	 * @param course The course to check.
+	 * @return Returns true if there is an academic year requirement and false otherwise.
+	 */
+	public boolean checkAcademicYear (String course) {
+
+		CoursePrerequisites temp = getRequirements(course);
+
+		String academicYear = temp.getAcademicYear();
+
+		if(academicYear.equals("")) {
+
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * This method retrieves the academic year requirement for a particular course.
+	 * @param course The course you want to know the academic year requirement of.
+	 * @return The academic year requirement.
+	 */
+	public String retrieveAcademicYear (String course) {
+
+		CoursePrerequisites temp = getRequirements(course);
+
+		String academicYear = temp.getAcademicYear();
+
+		return academicYear;
+
+	}
+
+	/**
 	 * This method checks whether or not a course is contained within a list of courses.
 	 * @param courseList The list of courses to check against.
 	 * @param course The course to check the list against.
