@@ -1,4 +1,10 @@
 
+/**
+ * Author           : Christopher Bell
+ * Date             : 04-16-2016
+ * Info             : Reads the prerequisite reqirements from a .xml file.
+ */
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
