@@ -1,0 +1,13 @@
+<student>
+  <level>Sophomore</level>
+  <credits>72</credits>
+  <degree>Computer Science</degree>
+  <courses>
+    <course>CSE 174</course>
+    <course>CSE 201</course>
+    <course>CSE 271</course>
+    <course>CSE 274</course>
+    <course>CSE 278</course>
+    <course>CSE 283</course>
+  </courses>
+</student>

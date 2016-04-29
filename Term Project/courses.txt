@@ -1,0 +1,47 @@
+CSE 102 Introduction to Computing and Engineering
+CSE 148 Business Computing
+CSE 151 Computers, Computer Science, and Society
+CSE 163 Introduction to Computer Concepts and Programming
+CSE 174 Fundamentals of Programming and Problem Solving
+CSE 201 Introduction to Software Engineering
+CSE 211 Software Construction
+CSE 212 Software Engineering for Human Computer Interaction
+CSE 220 Professional Practice
+CSE 241 Computational Modeling and Simulation
+CSE 243 Problem Analysis and Computers
+CSE 251 Intro to Game Programming
+CSE 252 Web Application Programming
+CSE 253 Programming Problems
+CSE 270 Special Topics
+CSE 273 Optimization Modeling
+CSE 262 Technology, Ethics, and Global Society
+CSE 271 Object-Oriented Programming
+CSE 274 Data Abstraction and Data Structures
+CSE 278 Computer Architecture
+CSE 283 Data Communication and Networks
+CSE 287 Foundations of Graphics
+CSE 311 Software Architecture and Design
+CSE 321 Software Quality Assurance and Testing
+CSE 322 Software Requirements
+CSE 340 Undergraduate Summer Scholars Program
+CSE 372 Stochastic Modeling
+CSE 381 Operating Systems
+CSE 383 Client Server Programming
+CSE 385 Database Systems
+CSE 386 Introduction to Computer Graphics
+CSE 443 High Performance Computing & Parallel Programming
+CSE 451 Web Services and Service Oriented Architectures
+CSE 448 Senior Design Project
+CSE 449 Senior Design Project
+CSE 464 Algorithms
+CSE 465 Comparative Programming Languages
+CSE 467 Computer and Network Security
+CSE 470 Special Topics In CSE
+CSE 471 Simulation
+CSE 473 Automata, Formal Languages, and Computability
+CSE 474 Compiler Design
+CSE 480 Special Problems
+CSE 485 Advanced Database Systems
+CSE 486 Introduction to Artificial Intelligence
+CSE 487 Game Design and Implementation
+CSE 491 Undergraduate Research

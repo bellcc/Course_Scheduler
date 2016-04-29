@@ -1,0 +1,270 @@
+<degree>
+
+	<course>
+		<name>CSE 102</name>
+	</course>
+
+	<course>
+		<name>CSE 141</name>
+	</course>
+
+	<course>
+		<name>CSE 148</name>
+	</course>
+
+	<course>
+		<name>CSE 151</name>
+	</course>
+
+	<course>
+		<name>CSE 153</name>
+	</course>
+
+	<course>
+		<name>CSE 163</name>
+	</course>
+
+	<course>
+		<name>CSE 174</name>
+	</course>
+
+	<course>
+		<name>CSE 177</name>
+	</course>
+
+	<course>
+		<name>CSE 201</name>
+		<anPreReq>CSE 271</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 211</name>
+		<anPreReq>CSE 201</anPreReq>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 212</name>
+		<anPreReq>CSE 271</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 241</name>
+	</course>
+
+	<course>
+		<name>CSE 251</name>
+	</course>
+
+	<course>
+		<name>CSE 252</name>
+	</course>
+
+	<course>
+		<name>CSE 253</name>
+		<orPreReq>CSE 153</orPreReq>
+		<orPreReq>CSE 163</orPreReq>
+		<orPreReq>CSE 174</orPreReq>
+	</course>
+
+	<course>
+		<name>CSE 262</name>
+		<anPreReq>ENG 111</anPreReq>
+		<credit>20</credit>
+	</course>
+
+	<course>
+		<name>CSE 270</name>
+	</course>
+
+	<course>
+		<name>CSE 271</name>
+		<anPreReq>CSE 174</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 273</name>
+	</course>
+
+	<course>
+		<name>CSE 274</name>
+		<anPreReq>CSE 271</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 277</name>
+	</course>
+
+	<course>
+		<name>CSE 278</name>
+		<anPreReq>CSE 271</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 283</name>
+		<anPreReq>CSE 271</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 310</name>
+	</course>
+
+	<course>
+		<name>CSE 311</name>
+		<anPreReq>CSE 201</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 320</name>
+	</course>
+
+	<course>
+		<name>CSE 321</name>
+		<anPreReq>CSE 201</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 322</name>
+		<anPreReq>CSE 201</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 340</name>
+	</course>
+
+	<course>
+		<name>CSE 372</name>
+	</course>
+
+	<course>
+		<name>CSE 377</name>
+	</course>
+
+	<course>
+		<name>CSE 381</name>
+		<anPreReq>CSE 274</anPreReq>
+		<anPreReq>CSE 278</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 383</name>
+		<anPreReq>CSE 274</anPreReq>
+		<anPreReq>CSE 284</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 385</name>
+		<anPreReq>CSE 274</anPreReq>
+		<coPreReq>CSE 274</coPreReq>
+	</course>
+
+	<course>
+		<name>CSE 386</name>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 441</name>
+		<anPreReq>CSE 102</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 443</name>
+		<anPreReq>CSE 278</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 448</name>
+		<anPreReq>CSE 201</anPreReq>
+		<anPreReq>CSE 274</anPreReq>
+		<level>SENIOR</level>
+	</course>
+
+	<course>
+		<name>CSE 449</name>
+		<anPreReq>CSE 448</anPreReq>
+		<level>SENIOR</level>
+	</course>
+
+	<course>
+		<name>CSE 451</name>
+		<anPreReq>CSE 274</anPreReq>
+		<anPreReq>CSE 283</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 464</name>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 465</name>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 466</name>
+	</course>
+
+	<course>
+		<name>CSE 467</name>
+		<anPreReq>CSE 283</anPreReq>
+		<anPreReq>CSE 383</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 470</name>
+	</course>
+
+	<course>
+		<name>CSE 471</name>
+		<anPreReq>CSE 174</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 473</name>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 474</name>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 477</name>
+	</course>
+
+	<course>
+		<name>CSE 480</name>
+	</course>
+
+	<course>
+		<name>CSE 481</name>
+		<level>SENIOR</level>
+	</course>
+
+	<course>
+		<name>CSE 483</name>
+	</course>
+
+	<course>
+		<name>CSE 485</name>
+		<anPreReq>CSE 385</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 486</name>
+		<anPreReq>CSE 274</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 487</name>
+		<anPreReq>CSE 386</anPreReq>
+	</course>
+
+	<course>
+		<name>CSE 491</name>
+	</course>
+
+</degree>
